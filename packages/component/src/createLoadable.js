@@ -23,6 +23,15 @@ function createLoadable({ resolve = identity, render, onLoad }) {
   function loadable(loadableConstructor, options = {}) {
     const ctor = resolveConstructor(loadableConstructor)
     const cache = {}
+    function getCacheKey(props) {
+      if (options.cacheKey) {
+        return options.cacheKey(props)
+      }
+      if (ctor.resolve) {
+        return ctor.resolve(props)
+      }
+      return null
+    }
 
     class InnerLoadable extends React.Component {
       constructor(props) {
@@ -33,6 +42,8 @@ function createLoadable({ resolve = identity, render, onLoad }) {
           error: null,
           loading: true,
         }
+
+        this.promise = null
 
         invariant(
           !props.__chunkExtractor || ctor.requireSync,
@@ -74,6 +85,15 @@ function createLoadable({ resolve = identity, render, onLoad }) {
         }
       }
 
+      componentDidUpdate(prevProps) {
+        if (!Object.is(getCacheKey(prevProps), getCacheKey(this.props))) {
+          // eslint-disable-next-line react/no-did-update-set-state
+          this.setState({ loading: true })
+          this.promise = null
+          this.loadAsync()
+        }
+      }
+
       componentWillUnmount() {
         this.mounted = false
       }
@@ -106,7 +126,7 @@ function createLoadable({ resolve = identity, render, onLoad }) {
       }
 
       getCacheKey() {
-        return JSON.stringify(this.props)
+        return getCacheKey(this.props) || JSON.stringify(this.props)
       }
 
       getCache() {
