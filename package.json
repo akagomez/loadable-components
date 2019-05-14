@@ -1,56 +1,26 @@
 {
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "bundlesize": [
-    {
-      "path": "./packages/component/dist/loadable.min.js",
-      "maxSize": "3.2 kB"
-    }
-  ],
-  "scripts": {
-    "build": "lerna run build",
-    "ci": "yarn build && yarn lint && yarn test --ci && bundlesize",
-    "dev": "WATCH_MODE=true lerna run build --parallel -- --watch",
-    "format": "prettier --write \"**/*.{js,json,md}\"",
-    "lint": "eslint .",
-    "release": "lerna publish --conventional-commits && conventional-github-releaser --preset angular",
-    "test": "jest"
+  "name": "@loadable/babel-plugin",
+  "description": "Babel plugin for loadable (required for SSR).",
+  "version": "5.8.0",
+  "main": "lib/index.js",
+  "repository": "git@github.com:smooth-code/loadable-components.git",
+  "author": "Greg Bergé <berge.greg@gmail.com>",
+  "publishConfig": {
+    "access": "public"
   },
-  "devDependencies": {
-    "@babel/cli": "^7.4.3",
-    "@babel/core": "^7.4.3",
-    "@babel/node": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.4.0",
-    "@babel/preset-env": "^7.4.3",
-    "@babel/preset-react": "^7.0.0",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-eslint": "^10.0.1",
-    "babel-jest": "^24.7.1",
-    "bundlesize": "^0.17.1",
-    "conventional-github-releaser": "^3.1.2",
-    "cross-env": "^5.2.0",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-prettier": "^4.1.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-react": "^7.12.4",
-    "jest": "^24.7.1",
-    "jest-dom": "^3.2.2",
-    "lerna": "^3.13.2",
-    "prettier": "^1.16.4",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-testing-library": "^7.0.0",
-    "regenerator-runtime": "^0.13.2",
-    "rollup": "^1.9.3",
-    "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-commonjs": "^9.3.4",
-    "rollup-plugin-node-resolve": "^4.2.2",
-    "rollup-plugin-replace": "^2.2.0",
-    "rollup-plugin-uglify": "^6.0.2",
-    "shx": "^0.3.2"
+  "keywords": [
+    "loadable"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "license": "MIT",
+  "scripts": {
+    "prebuild": "shx rm -rf lib",
+    "build": "BUILD_TARGET=node babel --config-file ../../babel.config.js -d lib --ignore \"**/*.test.js\" src",
+    "prepublishOnly": "yarn run build"
+  },
+  "dependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0"
   }
 }
